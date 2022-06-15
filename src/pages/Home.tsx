@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import { AxiosError } from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { getDayWebtoon } from "../api";
+import { webtoonData } from "../models/webtoonData";
 
 const Home: React.FC = () => {
   const [tab, setTab] = useState<number>(0);
+  const [platform, setPlatform] = useState<string>("all");
   const [selectPlatform, setSelectPlatform] = useState<string>("전체");
   const [isOpened, setIsOpened] = useState<boolean>(false);
 
   const today: number = new Date().getDay();
-
   const week: string[] = ["월", "화", "수", "목", "금", "토", "일"];
-  const platform = ["전체", "네이버 웹툰", "카카오 웹툰", "카카오 페이지"];
+  const platformList = ["전체", "네이버 웹툰", "카카오 웹툰", "카카오 페이지"];
+
+  const webtoonList = useQuery<any, AxiosError>(
+    ["webtoonList", platform, tab],
+    () => getDayWebtoon(platform, tab)
+  );
 
   const selectMenuHandler = (index: number) => {
     setTab(index);
@@ -22,12 +30,33 @@ const Home: React.FC = () => {
     setIsOpened(false);
   };
 
+  console.log(webtoonList.data);
+
   useEffect(() => {
     if (today - 1 === -1) {
       return setTab(6);
     }
     return setTab(today - 1);
   }, []);
+
+  useEffect(() => {
+    if (selectPlatform === "네이버 웹툰") {
+      return setPlatform("naver");
+    }
+
+    if (selectPlatform === "카카오 웹툰") {
+      return setPlatform("kakao");
+    }
+
+    if (selectPlatform === "카카오 페이지") {
+      return setPlatform("kakao-page");
+    }
+    return setPlatform("all");
+  }, [selectPlatform]);
+
+  useEffect(() => {
+    setIsOpened(false);
+  }, [platform]);
 
   return (
     <div>
@@ -62,7 +91,7 @@ const Home: React.FC = () => {
               : "hidden"
           }
         >
-          {platform.map((company) => (
+          {platformList.map((company) => (
             <li
               key={company}
               className="p-4 cursor-pointer hover:bg-gray-100"
