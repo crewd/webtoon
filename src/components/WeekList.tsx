@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const WeekList: React.FC = () => {
   const [tab, setTab] = useState<number>(0);
+  const today = new Date();
   const week: string[] = ["일", "월", "화", "수", "목", "금", "토"];
 
   const selectMenuHandler = (index: number) => {
     setTab(index);
   };
 
+  useEffect(() => {
+    setTab(today.getDay());
+  }, []);
+
   return (
-    <ul className="flex flex-row justify-around text-xl text-center">
+    <ul className="flex flex-row justify-between text-xl text-center">
       {week.map((day, index) => (
         <li
           className={
