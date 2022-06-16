@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { AxiosError } from "axios";
 
@@ -10,12 +10,18 @@ import Skeleton from "../components/Skeleton";
 
 import { getDayWebtoon } from "../api";
 import { webtoonData } from "../interfaces/webtoonData";
+import WebtoonDetail from "../components/WebtoonDetail";
 
 const Home: React.FC = () => {
   const [tab, setTab] = useState<number>(0);
   const [platform, setPlatform] = useState<string>("all");
   const [selectPlatform, setSelectPlatform] = useState<string>("전체");
+
   const [isOpened, setIsOpened] = useState<boolean>(false);
+
+  const [webtoonId, setWebtoonId] = useState<string>("");
+  const [webtoonInfo, setWebtoonInfo] = useState<webtoonData>();
+  const [modalOpend, setModalOpend] = useState<boolean>(false);
 
   const today: number = new Date().getDay();
   const week: string[] = ["월", "화", "수", "목", "금", "토", "일"];
@@ -30,20 +36,19 @@ const Home: React.FC = () => {
     }
   );
 
-  const selectMenuHandler = (index: number) => {
+  const selectMenuHandler = useCallback((index: number) => {
     setTab(index);
-  };
-
-  const selectFlatformHandler = (company: string) => {
-    setSelectPlatform(company);
-    setIsOpened(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (today - 1 === -1) {
       return setTab(6);
     }
     setTab(today - 1);
+  }, []);
+
+  const selectFlatformHandler = useCallback((company: string) => {
+    setSelectPlatform(company);
   }, []);
 
   useEffect(() => {
@@ -65,8 +70,36 @@ const Home: React.FC = () => {
     setIsOpened(false);
   }, [platform]);
 
+  const getWebtoonId = useCallback((id: string) => {
+    setWebtoonId(id);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalOpend(false);
+  }, []);
+
+  useEffect(() => {
+    if (!webtoonId) {
+      return setModalOpend(false);
+    }
+    setModalOpend(true);
+
+    const webtoon = webtoonList.data?.filter((id) => id._id === webtoonId);
+    setWebtoonInfo(webtoon?.[0]);
+  }, [webtoonId]);
+
+  useEffect(() => {
+    if (!modalOpend) {
+      setWebtoonId("");
+    }
+  }, [modalOpend]);
+
   return (
     <div>
+      {modalOpend && (
+        <WebtoonDetail onModal={closeModal} webtoonInfomation={webtoonInfo} />
+      )}
+
       <ul className="flex flex-row justify-between text-xl text-center">
         {week.map((day, index) => (
           <li
@@ -92,7 +125,7 @@ const Home: React.FC = () => {
           <ul
             className={
               isOpened === true
-                ? "rounded-md border border-gray-100 shadow-md w-[150px] text-center absolute top-10 z-100 bg-white"
+                ? "rounded-md border border-gray-100 shadow-md w-[150px] text-center absolute top-10 z-1 bg-white"
                 : "hidden"
             }
           >
@@ -116,7 +149,11 @@ const Home: React.FC = () => {
         {webtoonList.isLoading &&
           list.map((list, index) => <Skeleton key={index} />)}
         {webtoonList.data?.map((webtoon) => (
-          <WebtoonCard key={webtoon._id} webtoonInfo={webtoon} />
+          <WebtoonCard
+            key={webtoon._id}
+            webtoonInfo={webtoon}
+            getId={() => getWebtoonId(webtoon._id)}
+          />
         ))}
       </div>
     </div>

@@ -5,7 +5,7 @@ export interface webtoonData {
   url: string;
   img: string;
   service: string;
-  week: string[];
+  week: number[];
   additional: {
     new: boolean;
     adult: boolean;
