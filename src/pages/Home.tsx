@@ -20,7 +20,7 @@ const Home: React.FC = () => {
   const today: number = new Date().getDay();
   const week: string[] = ["월", "화", "수", "목", "금", "토", "일"];
   const platformList = ["전체", "네이버 웹툰", "카카오 웹툰", "카카오 페이지"];
-  const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const list: number[] = new Array(16).fill(0);
 
   const webtoonList = useQuery<webtoonData[], AxiosError>(
     ["webtoonList", platform, tab],
@@ -92,14 +92,18 @@ const Home: React.FC = () => {
           <ul
             className={
               isOpened === true
-                ? "rounded-md shadow-md w-[150px] text-center absolute top-10 z-100 bg-white"
+                ? "rounded-md border border-gray-100 shadow-md w-[150px] text-center absolute top-10 z-100 bg-white"
                 : "hidden"
             }
           >
-            {platformList.map((company) => (
+            {platformList.map((company, index) => (
               <li
                 key={company}
-                className="p-4 cursor-pointer hover:bg-gray-100"
+                className={
+                  index === 0 || index === 3
+                    ? "p-4 cursor-pointer hover:bg-gray-100 rounded-md"
+                    : "p-4 cursor-pointer hover:bg-gray-100"
+                }
                 onClick={() => selectFlatformHandler(company)}
               >
                 {company}
@@ -109,7 +113,8 @@ const Home: React.FC = () => {
         </div>
       </div>
       <div className="w-full flex flex-wrap">
-        {webtoonList.isLoading && list.map((list) => <Skeleton key={list} />)}
+        {webtoonList.isLoading &&
+          list.map((list, index) => <Skeleton key={index} />)}
         {webtoonList.data?.map((webtoon) => (
           <WebtoonCard key={webtoon._id} webtoonInfo={webtoon} />
         ))}
