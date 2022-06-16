@@ -29,20 +29,22 @@ const WebtoonDetail: React.FC<{
         onClick={props.onModal}
       ></div>
 
-      <div className="w-fit h-fit p-[30px] bg-white fixed m-auto top-[50%] bottom-[50%] left-0 right-0 z-20 ">
+      <div className="w-fit h-fit p-[20px] bg-white fixed m-auto top-[50%] bottom-[50%] left-0 right-0 z-20 rounded-2xl">
         <button
-          className="absolute -top-7 -right-7 w-[30px] h-[30px] rounded-full bg-white/50"
+          className="absolute -top-5 -right-5 w-[30px] h-[30px] rounded-full bg-white/70 hover:bg-white"
           onClick={props.onModal}
         >
           <FontAwesomeIcon icon={faX} />
         </button>
-        <div className="flex sm:flex-row flex-col">
-          <img
-            src={props.webtoonInfomation?.img}
-            alt={props.webtoonInfomation?._id}
-            className="md:mr-10 rounded-2xl"
-          />
-          <div className="p-[15px] h-full flex flex-col">
+        <div className="flex sm:flex-row flex-col sm:items-center">
+          <div className="md:mr-10">
+            <img
+              src={props.webtoonInfomation?.img}
+              alt={props.webtoonInfomation?._id}
+              className="rounded-xl"
+            />
+          </div>
+          <div className="h-full p-[15px]  flex flex-col">
             <div className="flex">
               <p className="h-[40px] leading-[40px] text-base mr-5 text-gray-400">
                 제목 :
@@ -95,9 +97,14 @@ const WebtoonDetail: React.FC<{
                 })}
               </h1>
             </div>
-            <button className="p-2 w-full bg-black mt-[10px] text-white">
+            <a
+              href={props.webtoonInfomation?.url}
+              target="_blank"
+              rel="noreferrer"
+              className="p-2 w-full bg-black text-white hover:bg-black/70 text-center mt-[20px]"
+            >
               바로 가기
-            </button>
+            </a>
           </div>
         </div>
       </div>
