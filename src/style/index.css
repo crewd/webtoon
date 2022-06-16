@@ -5,6 +5,7 @@
 
 body {
   font-family: 'Noto Sans KR', sans-serif;
+  -webkit-tap-highlight-color : transparent;
 }
 
 h1,
