@@ -24,7 +24,10 @@ const Home: React.FC = () => {
 
   const webtoonList = useQuery<webtoonData[], AxiosError>(
     ["webtoonList", platform, tab],
-    () => getDayWebtoon(platform, tab)
+    () => getDayWebtoon(platform, tab),
+    {
+      refetchOnWindowFocus: false, // window focus 설정
+    }
   );
 
   const selectMenuHandler = (index: number) => {
@@ -105,7 +108,7 @@ const Home: React.FC = () => {
           </ul>
         </div>
       </div>
-      <div className="w-full flex justify-between flex-wrap">
+      <div className="w-full flex flex-wrap">
         {webtoonList.isLoading && list.map((list) => <Skeleton key={list} />)}
         {webtoonList.data?.map((webtoon) => (
           <WebtoonCard key={webtoon._id} webtoonInfo={webtoon} />
