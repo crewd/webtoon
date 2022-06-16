@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { AxiosError } from "axios";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
+
+import WebtoonCard from "../components/WebtoonCard";
+import Skeleton from "../components/Skeleton";
+
 import { getDayWebtoon } from "../api";
-import { webtoonData } from "../models/webtoonData";
+import { webtoonData } from "../interfaces/webtoonData";
 
 const Home: React.FC = () => {
   const [tab, setTab] = useState<number>(0);
@@ -15,8 +20,9 @@ const Home: React.FC = () => {
   const today: number = new Date().getDay();
   const week: string[] = ["월", "화", "수", "목", "금", "토", "일"];
   const platformList = ["전체", "네이버 웹툰", "카카오 웹툰", "카카오 페이지"];
+  const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
 
-  const webtoonList = useQuery<any, AxiosError>(
+  const webtoonList = useQuery<webtoonData[], AxiosError>(
     ["webtoonList", platform, tab],
     () => getDayWebtoon(platform, tab)
   );
@@ -30,13 +36,11 @@ const Home: React.FC = () => {
     setIsOpened(false);
   };
 
-  console.log(webtoonList.data);
-
   useEffect(() => {
     if (today - 1 === -1) {
       return setTab(6);
     }
-    return setTab(today - 1);
+    setTab(today - 1);
   }, []);
 
   useEffect(() => {
@@ -77,30 +81,35 @@ const Home: React.FC = () => {
       </ul>
       <div className="flex flex-col items-end mt-[20px]">
         <div
-          className="w-[140px] flex justify-center items-center p-3 cursor-pointer"
+          className="w-[140px] flex justify-center items-center p-3 cursor-pointer relative"
           onClick={() => setIsOpened(!isOpened)}
         >
           <p className="mr-3">{selectPlatform}</p>
           <FontAwesomeIcon icon={faAngleDown} />
+          <ul
+            className={
+              isOpened === true
+                ? "rounded-md shadow-md w-[150px] text-center absolute top-10 z-100 bg-white"
+                : "hidden"
+            }
+          >
+            {platformList.map((company) => (
+              <li
+                key={company}
+                className="p-4 cursor-pointer hover:bg-gray-100"
+                onClick={() => selectFlatformHandler(company)}
+              >
+                {company}
+              </li>
+            ))}
+          </ul>
         </div>
-
-        <ul
-          className={
-            isOpened === true
-              ? "rounded-md shadow-md w-[150px] text-center"
-              : "hidden"
-          }
-        >
-          {platformList.map((company) => (
-            <li
-              key={company}
-              className="p-4 cursor-pointer hover:bg-gray-100"
-              onClick={() => selectFlatformHandler(company)}
-            >
-              {company}
-            </li>
-          ))}
-        </ul>
+      </div>
+      <div className="w-full flex justify-between flex-wrap">
+        {webtoonList.isLoading && list.map((list) => <Skeleton key={list} />)}
+        {webtoonList.data?.map((webtoon) => (
+          <WebtoonCard key={webtoon._id} webtoonInfo={webtoon} />
+        ))}
       </div>
     </div>
   );
