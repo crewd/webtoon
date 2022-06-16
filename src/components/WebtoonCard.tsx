@@ -8,7 +8,7 @@ const WebtoonCard: React.FC<{
   return (
     <div className="w-1/2 sm:w-1/3 p-3 md:w-1/4 rounded-md cursor-pointer">
       <div
-        className="hover:shadow-2xl hover:scale-110 z-99"
+        className="hover:shadow-2xl lg:hover:scale-110 z-99"
         onClick={props.getId}
       >
         <div>
