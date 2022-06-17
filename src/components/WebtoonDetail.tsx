@@ -101,7 +101,7 @@ const WebtoonDetail: React.FC<{
               href={props.webtoonInfomation?.url}
               target="_blank"
               rel="noreferrer"
-              className="p-2 w-full bg-black text-white hover:bg-black/70 text-center mt-[20px]"
+              className="p-2 w-full bg-zinc-800 text-white hover:bg-zinc-800/70 text-center mt-[20px]"
             >
               바로 가기
             </a>
