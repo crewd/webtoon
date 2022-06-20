@@ -41,7 +41,7 @@ const WebtoonDetail: React.FC<{
             <img
               src={props.webtoonInfomation?.img}
               alt={props.webtoonInfomation?._id}
-              className="rounded-xl"
+              className="rounded-xl w-full"
             />
           </div>
           <div className="h-full p-[15px] w-full flex flex-col">

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { AxiosError } from "axios";
+import { useSearchParams } from "react-router-dom";
+import { useQuery, useMutation } from "react-query";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
@@ -8,7 +8,7 @@ import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import WebtoonCard from "../components/WebtoonCard";
 import Skeleton from "../components/Skeleton";
 
-import { getDayWebtoon } from "../api";
+import { getDayWebtoon, getSearchData } from "../api";
 import { webtoonData } from "../interfaces/webtoonData";
 import WebtoonDetail from "../components/WebtoonDetail";
 
@@ -16,6 +16,9 @@ const Home: React.FC = () => {
   const [tab, setTab] = useState<number>(0);
   const [platform, setPlatform] = useState<string>("all");
   const [selectPlatform, setSelectPlatform] = useState<string>("전체");
+
+  const [searchParams] = useSearchParams();
+  const searchResultValue = searchParams.get("search");
 
   const [isOpened, setIsOpened] = useState<boolean>(false);
 
@@ -35,6 +38,15 @@ const Home: React.FC = () => {
       refetchOnWindowFocus: false, // window focus 설정
     }
   );
+
+  const searchResult = useMutation<webtoonData[]>(
+    ["searchResult", searchResultValue],
+    () => getSearchData(searchResultValue)
+  );
+
+  useEffect(() => {
+    searchResult.mutate();
+  }, [searchResultValue]);
 
   const selectMenuHandler = useCallback((index: number) => {
     setTab(index);
@@ -84,7 +96,9 @@ const Home: React.FC = () => {
     }
     setModalOpend(true);
 
-    const webtoon = webtoonList.data?.filter((id) => id._id === webtoonId);
+    const webtoon = searchResult.data
+      ? searchResult.data?.filter((id) => id._id === webtoonId)
+      : webtoonList.data?.filter((id) => id._id === webtoonId);
     setWebtoonInfo(webtoon?.[0]);
   }, [webtoonId]);
 
@@ -100,61 +114,76 @@ const Home: React.FC = () => {
         <WebtoonDetail onModal={closeModal} webtoonInfomation={webtoonInfo} />
       )}
 
-      <ul className="flex flex-row justify-between text-xl text-center">
-        {week.map((day, index) => (
-          <li
-            className={
-              tab === index
-                ? "w-20 pb-4 border-b-2 border-black font-bold cursor-pointer"
-                : "w-20 pb-4 cursor-pointer"
-            }
-            key={day}
-            onClick={() => selectMenuHandler(index)}
-          >
-            {day}
-          </li>
-        ))}
-      </ul>
+      {!searchResult.data && (
+        <ul className="flex flex-row justify-between text-xl text-center">
+          {week.map((day, index) => (
+            <li
+              className={
+                tab === index
+                  ? "w-20 pb-4 border-b-2 border-black font-bold cursor-pointer"
+                  : "w-20 pb-4 cursor-pointer"
+              }
+              key={day}
+              onClick={() => selectMenuHandler(index)}
+            >
+              {day}
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="flex flex-col items-end mt-[20px]">
-        <div
-          className="w-[140px] flex justify-center items-center p-3 cursor-pointer relative"
-          onClick={() => setIsOpened(!isOpened)}
-        >
-          <p className="mr-3">{selectPlatform}</p>
-          <FontAwesomeIcon icon={faAngleDown} />
-          <ul
-            className={
-              isOpened === true
-                ? "rounded-md border border-gray-100 shadow-md w-[150px] text-center absolute top-10 z-1 bg-white"
-                : "hidden"
-            }
+        {!searchResult.data && (
+          <div
+            className="w-[140px] flex justify-center items-center p-3 cursor-pointer relative"
+            onClick={() => setIsOpened(!isOpened)}
           >
-            {platformList.map((company, index) => (
-              <li
-                key={company}
-                className={
-                  index === 0 || index === 3
-                    ? "p-4 cursor-pointer hover:bg-gray-100 rounded-md"
-                    : "p-4 cursor-pointer hover:bg-gray-100"
-                }
-                onClick={() => selectFlatformHandler(company)}
-              >
-                {company}
-              </li>
-            ))}
-          </ul>
-        </div>
+            <p className="mr-3">{selectPlatform}</p>
+            <FontAwesomeIcon icon={faAngleDown} />
+            <ul
+              className={
+                isOpened === true
+                  ? "rounded-md border border-gray-100 shadow-md w-[150px] text-center absolute top-10 z-1 bg-white"
+                  : "hidden"
+              }
+            >
+              {platformList.map((company, index) => (
+                <li
+                  key={company}
+                  className={
+                    index === 0 || index === 3
+                      ? "p-4 cursor-pointer hover:bg-gray-100 rounded-md"
+                      : "p-4 cursor-pointer hover:bg-gray-100"
+                  }
+                  onClick={() => selectFlatformHandler(company)}
+                >
+                  {company}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="w-full flex flex-wrap">
-        {webtoonList.isLoading &&
-          list.map((list, index) => <Skeleton key={index} />)}
-        {webtoonList.data?.map((webtoon) => (
-          <WebtoonCard
-            key={webtoon._id}
-            webtoonInfo={webtoon}
-            getId={() => getWebtoonId(webtoon._id)}
-          />
-        ))}
+        {webtoonList.isLoading ||
+          (searchResult.isLoading &&
+            list.map((list, index) => <Skeleton key={index} />))}
+        {!searchResult.data &&
+          !searchResult.isLoading &&
+          webtoonList.data?.map((webtoon) => (
+            <WebtoonCard
+              key={webtoon._id}
+              webtoonInfo={webtoon}
+              getId={() => getWebtoonId(webtoon._id)}
+            />
+          ))}
+        {searchResult.data &&
+          searchResult.data.map((webtoon) => (
+            <WebtoonCard
+              key={webtoon._id}
+              webtoonInfo={webtoon}
+              getId={() => getWebtoonId(webtoon._id)}
+            />
+          ))}
       </div>
     </div>
   );

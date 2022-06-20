@@ -9,7 +9,10 @@ export const getDayWebtoon = async (platform: string, day: number) => {
   return data;
 };
 
-export const getSearchData = async (searchData: string) => {
+export const getSearchData = async (searchData: string | null) => {
+  if (!searchData) {
+    return;
+  }
   const { data } = await axios.get(`${host}/search?keyword=${searchData}`);
   if (data.statusCode) {
     return;
