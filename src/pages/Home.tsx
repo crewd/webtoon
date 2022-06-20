@@ -28,7 +28,7 @@ const Home: React.FC = () => {
   const platformList = ["전체", "네이버 웹툰", "카카오 웹툰", "카카오 페이지"];
   const list: number[] = new Array(16).fill(0);
 
-  const webtoonList = useQuery<webtoonData[], AxiosError>(
+  const webtoonList = useQuery<webtoonData[]>(
     ["webtoonList", platform, tab],
     () => getDayWebtoon(platform, tab),
     {

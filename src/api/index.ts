@@ -8,3 +8,11 @@ export const getDayWebtoon = async (platform: string, day: number) => {
   );
   return data;
 };
+
+export const getSearchData = async (searchData: string) => {
+  const { data } = await axios.get(`${host}/search?keyword=${searchData}`);
+  if (data.statusCode) {
+    return;
+  }
+  return data;
+};
