@@ -32,6 +32,9 @@ const AppLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   const searchEnterKeyHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      if (!searchValue) {
+        return;
+      }
       navigate({
         pathname: "/",
         search: createSearchParams({

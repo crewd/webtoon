@@ -13,7 +13,7 @@ import { webtoonData } from "../interfaces/webtoonData";
 import WebtoonDetail from "../components/WebtoonDetail";
 
 const Home: React.FC = () => {
-  const [tab, setTab] = useState<number>(0);
+  const [tab, setTab] = useState<number | string>(0);
   const [platform, setPlatform] = useState<string>("all");
   const [selectPlatform, setSelectPlatform] = useState<string>("전체");
 
@@ -27,7 +27,7 @@ const Home: React.FC = () => {
   const [modalOpend, setModalOpend] = useState<boolean>(false);
 
   const today: number = new Date().getDay();
-  const week: string[] = ["월", "화", "수", "목", "금", "토", "일"];
+  const week: string[] = ["월", "화", "수", "목", "금", "토", "일", "완결"];
   const platformList = ["전체", "네이버 웹툰", "카카오 웹툰", "카카오 페이지"];
   const list: number[] = new Array(16).fill(0);
 
@@ -49,12 +49,18 @@ const Home: React.FC = () => {
   }, [searchResultValue]);
 
   const selectMenuHandler = useCallback((index: number) => {
+    if (index === 7) {
+      return setTab("finished");
+    }
     setTab(index);
   }, []);
 
   useEffect(() => {
     if (today - 1 === -1) {
       return setTab(6);
+    }
+    if (today === 7) {
+      setTab("finished");
     }
     setTab(today - 1);
   }, []);
@@ -165,8 +171,9 @@ const Home: React.FC = () => {
       </div>
       <div className="w-full flex flex-wrap">
         {webtoonList.isLoading ||
-          (searchResult.isLoading &&
-            list.map((list, index) => <Skeleton key={index} />))}
+          list.map((list, index) => <Skeleton key={index} />)}
+        {searchResult.isLoading &&
+          list.map((list, index) => <Skeleton key={index} />)}
         {!searchResult.data &&
           !searchResult.isLoading &&
           webtoonList.data?.map((webtoon) => (
