@@ -64,7 +64,7 @@ const Home: React.FC = () => {
       setTab("finished");
     }
     setTab(today - 1);
-  }, []);
+  }, [searchResult.data]);
 
   useEffect(() => {
     if (tab === "finished") {
