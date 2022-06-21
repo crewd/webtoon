@@ -170,7 +170,7 @@ const Home: React.FC = () => {
         )}
       </div>
       <div className="w-full flex flex-wrap">
-        {webtoonList.isLoading ||
+        {webtoonList.isLoading &&
           list.map((list, index) => <Skeleton key={index} />)}
         {searchResult.isLoading &&
           list.map((list, index) => <Skeleton key={index} />)}
