@@ -14,6 +14,7 @@ import WebtoonDetail from "../components/WebtoonDetail";
 
 const Home: React.FC = () => {
   const [tab, setTab] = useState<number | string>(0);
+  const [tabMenu, setTabMenu] = useState<number | string>(0);
   const [platform, setPlatform] = useState<string>("all");
   const [selectPlatform, setSelectPlatform] = useState<string>("전체");
 
@@ -64,6 +65,13 @@ const Home: React.FC = () => {
     }
     setTab(today - 1);
   }, []);
+
+  useEffect(() => {
+    if (tab === "finished") {
+      return setTabMenu(7);
+    }
+    setTabMenu(tab);
+  }, [tab]);
 
   const selectFlatformHandler = useCallback((company: string) => {
     setSelectPlatform(company);
@@ -125,7 +133,7 @@ const Home: React.FC = () => {
           {week.map((day, index) => (
             <li
               className={
-                tab === index
+                tabMenu === index
                   ? "w-20 pb-4 border-b-2 border-black font-bold cursor-pointer"
                   : "w-20 pb-4 cursor-pointer"
               }
